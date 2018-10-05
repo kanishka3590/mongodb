@@ -1,0 +1,92 @@
+//just inserting 100000 data inside db.
+for(i=0;i<1000000;i++){
+db.items.insert({
+item_id:i,
+name:`item_${i}`,
+location:{
+	city:`New York_${i}`,
+	state:"NY",
+	pincode:`1000${i}`
+}
+})}
+
+//now we will find then it will show only 20 recordes
+
+//to find default index
+db.items.getIndexes();
+
+//when we search a item.it will take little time.
+db.items.find({item_id:30098});
+
+//to find how much time it is taking.
+db.items.find({item_id:30098}).explain("executionStats");
+
+//now when we give object id it will take less time.because of default indexing.
+db.items.find({"_id" : ObjectId("5ba5e36378534dbf5610adb6")}).explain("executionStats");
+
+//create index.now item_id we are making it as index. 1 for ascending order.-1 for descending
+db.items.createIndex({"item_id":1})
+
+//now there will be two index.check.
+db.items.getIndexes();
+
+//now it will take less time.
+
+//apply index on nested document
+db.items.createIndex({"location.city":1});
+
+//now it will show three index.
+
+//now find with nested
+db.items.find({"location.pincode":"10002798"});
+
+//time.it will search whole data.
+db.items.find({"location.pincode":"10002798"}).explain("executionStats");
+
+//nnow find nested document with index city.
+db.items.find({"location.city":"New York_22887"});
+
+//now time.now it will search only one document.
+db.items.find({"location.city":"New York_22887"}).explain("executionStats");
+
+//delete one index
+db.items.dropIndex({"location.city":1});
+
+//it will delete all indexes except defalut index.
+db.items.dropIndexes();
+
+
+//create index on parent.but there is no use to make parent document index beacuse it will search all recordes again.
+//so we should give nested index for this.
+db.items.createIndex({"location":1});
+
+//drop all index.now try new index method.
+
+//compound index.create one index with two fiels.it is one index.
+db.items.createIndex({"location.city":1,"location.pincode":1});
+
+//now either of this we give it will take less time to execute.
+db.items.find({"location.city":"New York_22887"}).explain("executionStats");
+db.items.find({"location.pincode":"1000768"}).explain("executionStats");
+
+//multi level key index.
+db.ratings.insert([{type:"food",items:"cake",rating:[6,4,2]},
+{type:"food",items:"cake",rating:[6,4,2]},
+{type:"food",items:"cake",rating:[3,2,2]},
+{type:"food",items:"cake",rating:[4,5,4]},
+{type:"food",items:"cake",rating:[1,2,4]},
+{type:"food",items:"cake",rating:[3,2,1]},
+{type:"food",items:"cake",rating:[5,3,1]},
+{type:"food",items:"cake",rating:[5,4,4]},
+{type:"food",items:"cake",rating:[3,5,2]},
+{type:"food",items:"cake",rating:[6,5,2]}]);
+
+//create.
+db.rating.createIndex({"rating":1})
+
+//now searching with rating
+db.ratings.find({rating:[5,3,1]})
+
+//time.now it will start searching which starts with 5 only.
+db.ratings.find({rating:[5,3,1]}).explain("executionStats");
+

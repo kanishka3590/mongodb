@@ -1,0 +1,17 @@
+//restrict the size of collection.
+db.createCollection("capp_col",{capped:true,size:10000});
+
+//to check is it a capped collection or not
+db.capp_col.isCapped();
+
+//assign capped after creating collection
+db.runCommand({"convertToCapped":"ratings",size:1000000});
+
+//restrict number of documents
+db.createCollection("cappcoll",{capped:true,size:10000,max:200});
+ 
+
+//capp collection work as queue.
+
+//to check how much recores can be inserted.
+db.capp_col.
